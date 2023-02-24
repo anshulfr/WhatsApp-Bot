@@ -1,0 +1,22 @@
+{
+  "name": "whatsapp-bot",
+  "version": "1.0.0",
+  "description": "A multipurpose whatsapp bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "whatsapp-bot"
+  },
+  "author": "anshulnegii",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "google-it": "^1.6.4",
+    "qrcode": "^1.5.1",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.19.4"
+  }
+}
