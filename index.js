@@ -2,6 +2,7 @@ const qrcode = require('qrcode-terminal');
 const google = require('google-it')
 const https = require('https');
 const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 const { Client } = require('whatsapp-web.js');
 const MessageMedia = require('whatsapp-web.js/src/structures/MessageMedia');
 const client = new Client({
@@ -218,9 +219,11 @@ client.on('message', async message => {
     }
     else if (message.body.toLowerCase().startsWith("/g ")) {
         const query = message.body.slice(2)
+        const apikey = process.env.API_KEY;
+        const orgkey = process.env.ORG_KEY;
         const configuration = new Configuration({
-            organization: 'org-732UguDhdSBgSJ4xRHEiYYqo',
-            apiKey: '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',
+            organization: orgkey,
+            apiKey: apikey,
         });
         const openai = new OpenAIApi(configuration);
         const response = await openai.createCompletion({
