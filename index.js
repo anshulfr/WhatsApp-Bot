@@ -182,10 +182,19 @@ client.on('message', async message => {
     }
     // sticker***
     else if(message.body.toLowerCase().startsWith('/sticker')) {
+        const desc = message.body.slice(9)
         if (message.hasMedia) {
-            const desc = message.body.slice(9)
-            const media = await message.downloadMedia();
+            const media = await message.downloadMedia()
             chat.sendMessage(media, { sendMediaAsSticker: true, stickerName: desc, stickerAuthor: "😶‍🌫️"});
+        } 
+        else if (message.hasQuotedMsg) {
+            const qmsg = await message.getQuotedMessage()
+            const media = qmsg.hasMedia ? await qmsg.downloadMedia() : qmsg.reply('*IMAGE NOT FOUND*')
+            try {
+                chat.sendMessage(media, { sendMediaAsSticker: true, stickerName: desc, stickerAuthor: "😶‍🌫️"});
+            } catch (e) {
+                
+            }
         } else {
             message.reply('*SEND IMAGE WITH A CAPTION*')
         }
@@ -249,7 +258,7 @@ client.on('message', async message => {
 // commands***
 client.on('message', message => {
     if (message.body === "/help"){
-        const commands = "*COMMANDS LIST*\n\n/sticker cute cat\n*Usage*: Send an image with this caption to make its sticker. Description is optional\n\n/tagall Special Announcement\n*Usage*: Tags everyone in the group. Tag Message is optional [Requires user to be an admin]\n\n/tagall-h\n*Usage*: Same as above but the tags are hidden. Tag Message is optional [Requires user to be an admin]\n\n/kick @user1 @user2 ...\n*Usage*: Kicks mention users [Requires both user and bot to be an admin]\n\n/add 919999988888\n*Usage*: Adds number to the group [Requires both user and bot to be an admin]\n\n/google GitHub\n*Usage*: Returns search results from google\n\n/wf integrate 5sinx/8x^2\n*Usage*: Get quick result from wolfram search engine (May take more time for complex queries)\n\n /av _and_ /av @user\n*Usage*: Returns your profile picture and if mentioned a user returns profile picture of mentioned user\n\n/darkjoke \n*Usage*: Returns cursed dark jokes"
+        const commands = "*COMMANDS LIST*\n\n/sticker cute cat\n*Usage*: Reply or send an image, gif or video with this caption to make its sticker. Description is optional\n\n/tagall Special Announcement\n*Usage*: Tags everyone in the group. Tag Message is optional [Requires user to be an admin]\n\n/tagall-h\n*Usage*: Same as above but the tags are hidden. Tag Message is optional [Requires user to be an admin]\n\n/kick @user1 @user2 ...\n*Usage*: Kicks mention users [Requires both user and bot to be an admin]\n\n/add 919999988888\n*Usage*: Adds number to the group [Requires both user and bot to be an admin]\n\n/google GitHub\n*Usage*: Returns search results from google\n\n/wf integrate 5sinx/8x^2\n*Usage*: Get quick result from wolfram search engine (May take more time for complex queries)\n\n /av _and_ /av @user\n*Usage*: Returns your profile picture and if mentioned a user returns profile picture of mentioned user\n\n/darkjoke \n*Usage*: Returns cursed dark jokes"
         message.reply(commands)
     }
 })
@@ -268,3 +277,5 @@ client.on('group_join', async grp => {
     var media = await MessageMedia.fromUrl('https://i.imgur.com/wiiVudk_d.webp?maxwidth=760&fidelity=grand')
     chat.sendMessage(media, {caption: `Welcome to ${chat.name}.\n\n Hope you have a great time here\n\nType /help to check out my commands `})
 })
+
+
