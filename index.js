@@ -1,6 +1,7 @@
 const qrcode = require('qrcode-terminal');
 const google = require('google-it')
 const https = require('https');
+const { Configuration, OpenAIApi } = require('openai');
 const { Client } = require('whatsapp-web.js');
 const MessageMedia = require('whatsapp-web.js/src/structures/MessageMedia');
 const client = new Client({
@@ -214,6 +215,20 @@ client.on('message', async message => {
             let media = MessageMedia.fromUrl('https://i.imgur.com/9fZoAIC.jpeg')
             message.reply(media)
         }
+    }
+    else if (message.body.toLowerCase().startsWith("/g ")) {
+        const query = message.body.slice(2)
+        const configuration = new Configuration({
+            organization: 'org-732UguDhdSBgSJ4xRHEiYYqo',
+            apiKey: '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',
+        });
+        const openai = new OpenAIApi(configuration);
+        const response = await openai.createCompletion({
+            model: 'text-davinci-003',
+            prompt: query
+        })
+        
+        message.reply(response.data.choices[0].text);
     }
     // darkjoke***
     else if(message.body.toLowerCase().startsWith("/darkjoke")) {
