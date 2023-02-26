@@ -204,7 +204,8 @@ client.on('message', async message => {
     // wolfram***
     else if (message.body.toLowerCase().startsWith("/wf ")) {
         const query = message.body.slice(3).replaceAll(" ", "+")
-        const url = "https://api.wolframalpha.com/v1/result?appid=VG592Y-74K2Q6EH4L&i="+ query +"%3f"
+        const wolframapikey = process.env.WOLFRAM_API_KEY
+        const url = "https://api.wolframalpha.com/v1/result?appid="+ wolframapikey +"&i="+ query +"%3f"
         try{
             https.get(url, (response) => {
                 response.on("data", (data) => {

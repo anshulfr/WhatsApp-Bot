@@ -13,9 +13,14 @@ npm install whatsapp-web.js https google-it qrcode-terminal dotenv
 ```
 /node_modules/
 .env
-API_KEY=your_api_key_here
+WOLFRAM_API_KEY=
+API_KEY=
+ORG_KEY=
 ```
-Replace `your_api_key_here` with your API key for the Wolfram Alpha API. You can get it from [here](https://products.wolframalpha.com/api)\
+Get `WOLFRAM_API_KEY` key from [here](https://products.wolframalpha.com/api)\
+Sign up for OpenAI Account
+Get `API_KEY` from [here](https://platform.openai.com/account/api-keys)
+Get `ORG_KEY` from [here](https://platform.openai.com/account/org-settings)
 4. Start the bot: `node index.js`\
 5. Scan the QR code using your WhatsApp mobile app.\
 6. Once the bot is ready, you can use the commands.
@@ -31,6 +36,7 @@ Type `/help` to check out the commands.
 - qrcode-terminal
 - https
 - Wolfram Alpha API
+- OpenAI API
 
 ## License
 
