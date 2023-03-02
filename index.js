@@ -1,5 +1,4 @@
-const qrcode = require('qrcode-terminal');
-const google = require('google-it')
+const google = require('google-it') 
 const https = require('https');
 const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
@@ -11,11 +10,25 @@ const client = new Client({
         executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', 
     },
 });
+const express = require('express');
+const qrcode = require('qr-image');
+const fetch = require('node-fetch');
+const cid=process.env.CLIENT_ID;
+const sid=process.env.SECRET_ID;
 
 client.on('qr', qr => {
-    qrcode.generate(qr, {small: true});
+    const qrCode = qrcode.imageSync(qr, { type: 'png' });
+    const qrCodeURI = `data:image/png;base64,${qrCode.toString('base64')}`;
+    const app = express();
+  
+    app.get('/', (req, res) => {
+        res.send(`<img src="${qrCodeURI}">`);
+    });
+    app.listen(
+        process.env.PORT || 3000,
+    )
 });
-
+  
 client.on('ready', () => {
     console.log('Client is ready!');
 });
@@ -182,18 +195,72 @@ client.on('message', async message => {
             message.reply('Google Error : ' + e);
         })
     }
+    //reddit***
+    else if(message.body.toLowerCase().startsWith('/r ')){
+        const subreddit = message.body.slice(3);
+        fetch('https://www.reddit.com/api/v1/access_token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': `Basic ${btoa(`${cid}:${sid}`)}`
+            },
+            body: 'grant_type=client_credentials'
+          })
+          .then(response => response.json())
+          .then(data => {
+            const accessToken = data.access_token;
+            fetch(`https://oauth.reddit.com/r/${subreddit}/hot?limit=100&include_over_18=false`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
+              }
+            })
+            .then(response => response.json())
+            .then(async data => {
+              const posts = data.data.children;
+              const images = [];
+          
+              posts.filter(post => post.data.post_hint === 'image' && !post.data.over_18)
+                   .forEach(post => {
+                     images.push(post.data.url);
+                   });
+          
+              const randomIndex = Math.floor(Math.random() * images.length);
+              const randomImage = images[randomIndex];
+          
+              var media = await MessageMedia.fromUrl(randomImage)
+              chat.sendMessage(media, {caption: `From r/${subreddit}`})
+            })
+            .catch(error => message.reply('Invalid Subreddit'));
+          })
+          .catch(error => message.reply(`Unknown Error`));
+    }
     // sticker***
     else if(message.body.toLowerCase().startsWith('/sticker')) {
-        const desc = message.body.slice(9)
+        const text = message.body;
+        const parts = text.split(",,");
+        let desc = "";
+        let author = "";
+        
+        if (parts.length > 1) {
+          desc = parts[0].slice(9);
+          author = parts[1].trim();
+        } else {
+          desc = text.slice(9);
+        }
+        
+        if (author === "") {
+          author = "AURA";
+        }
+                
         if (message.hasMedia) {
             const media = await message.downloadMedia()
-            chat.sendMessage(media, { sendMediaAsSticker: true, stickerName: desc, stickerAuthor: "😶‍🌫️"});
+            chat.sendMessage(media, { sendMediaAsSticker: true, stickerName: desc, stickerAuthor: author});
         } 
         else if (message.hasQuotedMsg) {
             const qmsg = await message.getQuotedMessage()
             const media = qmsg.hasMedia ? await qmsg.downloadMedia() : qmsg.reply('*IMAGE NOT FOUND*')
             try {
-                chat.sendMessage(media, { sendMediaAsSticker: true, stickerName: desc, stickerAuthor: "😶‍🌫️"});
+                chat.sendMessage(media, { sendMediaAsSticker: true, stickerName: desc, stickerAuthor: author});
             } catch (e) {
                 
             }
@@ -229,7 +296,10 @@ client.on('message', async message => {
         const openai = new OpenAIApi(configuration);
         const response = await openai.createCompletion({
             model: 'text-davinci-003',
-            prompt: query
+            prompt: query,
+            max_tokens: 1024,
+            stop: '.\n',
+            temperature: 0.5,
         })
         
         message.reply(response.data.choices[0].text);
@@ -277,7 +347,7 @@ client.on('message', async message => {
 // commands***
 client.on('message', message => {
     if (message.body === "/help"){
-        const commands = "*COMMANDS LIST*\n\n/sticker cute cat\n*Usage*: Reply or send an image, gif or video with this caption to make its sticker. Description is optional\n\n/tagall Special Announcement\n*Usage*: Tags everyone in the group. Tag Message is optional [Requires user to be an admin]\n\n/tagall-h\n*Usage*: Same as above but the tags are hidden. Tag Message is optional [Requires user to be an admin]\n\n/kick @user1 @user2 ...\n*Usage*: Kicks mention users [Requires both user and bot to be an admin]\n\n/add 919999988888\n*Usage*: Adds number to the group [Requires both user and bot to be an admin]\n\n/google GitHub\n*Usage*: Returns search results from google\n\n/wf integrate 5sinx/8x^2\n*Usage*: Get quick result from wolfram search engine (May take more time for complex queries)\n\n /av _and_ /av @user\n*Usage*: Returns your profile picture and if mentioned a user returns profile picture of mentioned user\n\n/darkjoke \n*Usage*: Returns cursed dark jokes"
+        const commands = "*COMMANDS LIST*\n\n/sticker cute cat,, neko\n*Usage*: Reply or send an image, gif or video with this caption to make its sticker. Use ,, to separate description and author. Description and author are optional\n\n/tagall Special Announcement\n*Usage*: Tags everyone in the group. Tag Message is optional [Requires user to be an admin]\n\n/tagall-h\n*Usage*: Same as above but the tags are hidden. Tag Message is optional [Requires user to be an admin]\n\n/kick @user1 @user2 ...\n*Usage*: Kicks mention users [Requires both user and bot to be an admin]\n\n/add 919999988888\n*Usage*: Adds number to the group [Requires both user and bot to be an admin]\n\n/google GitHub\n*Usage*: Returns search results from google\n\n/wf integrate 5sinx/8x^2\n*Usage*: Get quick result from wolfram search engine (May take more time for complex queries)\n\n /g query\n*Usage*: Returns results from OpenAI's davinci model api\n\n /av _and_ /av @user\n*Usage*: Returns your profile picture and if mentioned a user returns profile picture of mentioned user\n\n/darkjoke \n*Usage*: Returns cursed dark jokes"
         message.reply(commands)
     }
 })
