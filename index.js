@@ -45,23 +45,20 @@ client.on('message', message => {
 client.on('message', async message => {
     let chat = await message.getChat();
     if (chat.isGroup) {
+        //kick***
         if (message.body.toLowerCase().startsWith("/kick ")) {
             if (checkAdmin(chat.participants, message.author)) {
-                let number = message.body.slice(6);
-                var numArr =  number.split(' ');
-                for(num in numArr){
-                    numArr[num] = numArr[num].includes("@c.us") ? numArr[num] : `${numArr[num]}@c.us`;
+                const numbers = message.body.slice(6);
+                var numArr =  numbers.split(' ');
+                for (let i = 0; i < numArr.length; i++) {
+                    var num = numArr[i];
+                    num = `${num.slice(1)}@c.us`
+                    const remArr = [];
+                    remArr.push(num);
                     try {
-                        let finNumber = numArr[i].slice(1);
-                        remArray = [];
-                        remArray.push(finNumber);
-                        try {
-                            chat.removeParticipants(remArray);
-                        } catch (e) {
-                            message.reply('Invalid User')
-                        }
-                    } catch (e) {
-                        message.reply('Invalid Number')
+                        chat.removeParticipants(remArr);
+                    } catch (error) {
+                        message.reply('Invalid User')
                     }
                 }
             } else {
@@ -171,7 +168,7 @@ client.on('message', async message => {
               await client.acceptInvite(inviteCode);
             }
         } catch (e) {
-            message.reply('Invalid Group')
+            message.reply('Invalid Group!')
         }
     }
 
