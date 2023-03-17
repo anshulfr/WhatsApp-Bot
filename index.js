@@ -10,7 +10,7 @@ const client = new Client({
   puppeteer: {
     args: ["--no-sandbox"],
     executablePath:
-      "/nix/store/58gnnsq47bm8zw871chaxm65zrnmnw53-ungoogled-chromium-108.0.5359.95/bin/chromium-browser",
+      "node_modules\\puppeteer\\.local-chromium\\win64-982053\\chrome-win\\chrome.exe",
   },
 });
 const express = require('express');
