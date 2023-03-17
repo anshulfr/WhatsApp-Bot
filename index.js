@@ -4,11 +4,15 @@ const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
 const { Client } = require('whatsapp-web.js');
 const MessageMedia = require('whatsapp-web.js/src/structures/MessageMedia');
+const { Client, LocalAuth } = require('whatsapp-web.js');
+
 const client = new Client({
-    puppeteer: { 
-        headless: true,
-        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', 
-    },
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    args: ["--no-sandbox"],
+    executablePath:
+      "/nix/store/58gnnsq47bm8zw871chaxm65zrnmnw53-ungoogled-chromium-108.0.5359.95/bin/chromium-browser",
+  },
 });
 const express = require('express');
 const qrcode = require('qr-image');
@@ -108,48 +112,25 @@ client.on('message', async message => {
         // av @***
         else if (message.body.toLowerCase().includes('/av ')) {
             let user = message.body.slice(5) + "@c.us"
-            for (participant of chat.participants) {
-                const contact = await client.getContactById(participant.id._serialized);
-                if (participant.id._serialized == user) {
-                    try {
-                        var av = await contact.getProfilePicUrl();
-                        let media = await MessageMedia.fromUrl(av)
-                        message.reply(media)
-                    } catch (e) {
-                        message.reply('User Profile Picture not available')
-                    }
-                }      
+            const contact = await client.getContactById(user);
+            try {
+                var av = await contact.getProfilePicUrl();
+                let media = await MessageMedia.fromUrl(av)
+                message.reply(media)
+            } catch (e) {
+                message.reply('User Profile Picture not available')
             }
         }
         // av***
         else if (message.body.toLowerCase() === '/av') {
-            for (participant of chat.participants) {
-                const contact = await client.getContactById(participant.id._serialized);
-                if (participant.id._serialized == message.author) {
-                    try {
-                        var av = await contact.getProfilePicUrl();
-                        let media = await MessageMedia.fromUrl(av)
-                        message.reply(media)
-                    } catch (e) {
-                        message.reply('User Profile Picture not available')
-                    }
-                }      
+            const contact = await client.getContactById(message.author);
+            try {
+                var av = await contact.getProfilePicUrl();
+                let media = await MessageMedia.fromUrl(av)
+                message.reply(media)
+            } catch (e) {
+                message.reply('User Profile Picture not available')
             }
-        }
-    }
-    //av***
-    if (message.body.toLowerCase() === '/av') {
-        for (participant of chat.participants) {
-            const contact = await client.getContactById(participant.id._serialized);
-            if (participant.id._serialized == message.author) {
-                try {
-                    var av = await contact.getProfilePicUrl();
-                    let media = await MessageMedia.fromUrl(av)
-                    message.reply(media)
-                } catch (e) {
-                    message.reply('User Profile Picture not available')
-                }
-            }      
         }
     }
     // join group***
