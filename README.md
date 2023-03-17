@@ -20,7 +20,7 @@ ORG_KEY=
 Get `WOLFRAM_API_KEY` key from [here](https://products.wolframalpha.com/api)\
 Sign up for OpenAI Account
 Get `API_KEY` from [here](https://platform.openai.com/account/api-keys)
-Get `ORG_KEY` from [here](https://platform.openai.com/account/org-settings)
+Get `ORG_KEY` from [here](https://platform.openai.com/account/org-settings)\
 4. Start the bot: `node index.js`\
 5. Scan the QR code using your WhatsApp mobile app.\
 6. Once the bot is ready, you can use the commands.
