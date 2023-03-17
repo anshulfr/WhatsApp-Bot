@@ -18,6 +18,7 @@ const qrcode = require('qr-image');
 const fetch = require('node-fetch');
 const cid=process.env.CLIENT_ID;
 const sid=process.env.SECRET_ID;
+const app = express();
 
 app.get('/', (req, res) => {
     client.on('qr', qr => {
