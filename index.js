@@ -20,18 +20,17 @@ const fetch = require('node-fetch');
 const cid=process.env.CLIENT_ID;
 const sid=process.env.SECRET_ID;
 
-client.on('qr', qr => {
-    const qrCode = qrcode.imageSync(qr, { type: 'png' });
-    const qrCodeURI = `data:image/png;base64,${qrCode.toString('base64')}`;
-    const app = express();
-  
-    app.get('/', (req, res) => {
+app.get('/', (req, res) => {
+    client.on('qr', qr => {
+        const qrCode = qrcode.imageSync(qr, { type: 'png' });
+        const qrCodeURI = `data:image/png;base64,${qrCode.toString('base64')}`;
         res.send(`<img src="${qrCodeURI}">`);
     });
-    app.listen(
-        process.env.PORT || 3000,
-    )
+
 });
+app.listen(
+    process.env.PORT || 3000,
+)
   
 client.on('ready', () => {
     console.log('Client is ready!');
