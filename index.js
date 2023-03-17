@@ -2,7 +2,6 @@ const google = require('google-it')
 const https = require('https');
 const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
-const { Client } = require('whatsapp-web.js');
 const MessageMedia = require('whatsapp-web.js/src/structures/MessageMedia');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
