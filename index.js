@@ -3,34 +3,25 @@ const https = require('https');
 const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
 const MessageMedia = require('whatsapp-web.js/src/structures/MessageMedia');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client } = require('whatsapp-web.js');
 
 const client = new Client({
-  authStrategy: new LocalAuth(),
   puppeteer: {
     args: ["--no-sandbox"],
-    executablePath:
-      "node_modules\\puppeteer\\.local-chromium\\win64-982053\\chrome-win\\chrome.exe",
   },
 });
-const express = require('express');
-const qrcode = require('qr-image');
+const qrcode = require('qrcode-terminal');
 const fetch = require('node-fetch');
 const cid=process.env.CLIENT_ID;
 const sid=process.env.SECRET_ID;
-const app = express();
 
-app.get('/', (req, res) => {
-    client.on('qr', qr => {
-        const qrCode = qrcode.imageSync(qr, { type: 'png' });
-        const qrCodeURI = `data:image/png;base64,${qrCode.toString('base64')}`;
-        res.send(`<img src="${qrCodeURI}">`);
-    });
-
+client.on('qr', qr => {
+    qrcode.generate(qr, {small: true});
 });
-app.listen(
-    process.env.PORT || 3000,
-)
+
+client.on('ready', () => {
+    console.log('Client is ready!');
+});
   
 client.on('ready', () => {
     console.log('Client is ready!');
