@@ -26,9 +26,10 @@ client.on('ready', () => {
 client.initialize();
 
 client.on('message', message => {
-	if(message.body === '/ping') {
-		message.reply('pong');
-	}
+    if(message.body === '/ping') {
+	    console.log(message.body)
+        message.reply('pong');
+    }
 });
 
 // commands
