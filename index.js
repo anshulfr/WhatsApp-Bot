@@ -4,6 +4,9 @@ const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
 const MessageMedia = require('whatsapp-web.js/src/structures/MessageMedia');
 const { Client } = require('whatsapp-web.js');
+const puppeteer = require('puppeteer');
+var html2json = require('html2json').html2json;
+
 
 const client = new Client({
   puppeteer: {
@@ -233,6 +236,139 @@ client.on('message', async message => {
             message.reply('*SEND IMAGE WITH A CAPTION*')
         }
     }
+
+    // astronomy picture of the day**
+    else if(message.body.toLowerCase().startsWith('/apod')){
+		request("https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY", async function(error, response, body){
+			let chat = await message.getChat();
+			let r = JSON.parse(body);
+			var media = await MessageMedia.fromUrl(r['hdurl']);
+			await chat.sendMessage(media, {caption: `Title: ${r['title']}\nDescription: ${r['explanation']}\nDate: ${r['date']}`});
+		});
+	}
+
+	// youtube**
+	else if(message.body.toLowerCase().startsWith('/youtube ')){
+		const question = message.body.slice(9);
+		const  engine_id = "KEY";
+		const api_key = "KEY";
+		const page = 1;
+		const start = (page - 1) * 10 + 1;
+
+		request('https://www.googleapis.com/customsearch/v1?key=' + api_key + '&cx=' + engine_id + '&q=' + question + '&start=' + start, function(error, response, body){
+			let links_json = JSON.parse(body);
+			let items = links_json['items'];
+			let firstSearch = items[0];
+			url = firstSearch['link'];
+			message.reply(url)
+	        });
+	    }
+
+	// spotify song searcher**
+	else if(message.body.toLowerCase().startsWith('/spotify ')){
+		const query = message.body.slice(9)
+		const options = {
+		    method: 'GET',
+		    url: 'https://spotify23.p.rapidapi.com/search/',
+		    qs: {
+		      q: query,
+		      type: 'multi',
+		      offset: '0',
+		      limit: '10',
+		      numberOfTopResults: '5'
+		    },
+		    headers: {
+		      'X-RapidAPI-Key': "KEY",
+		      'X-RapidAPI-Host': 'spotify23.p.rapidapi.com',
+		      useQueryString: true
+		    }
+		  };
+		  
+		  request(options, function (error, response, body) {
+		      let js = JSON.parse(body);
+		      let tracks = js["tracks"]
+		      let items = tracks["items"]
+		      let data = items[0]
+		      let data2 = data["data"]
+		      let raw_uri = data2["uri"]
+		  
+		      let raw_uri2 = raw_uri.split(":")
+		      let uri = raw_uri2[2]
+		      message.reply(`https://open.spotify.com/track/${uri}`)
+		  
+		  });
+	    }
+
+
+	// lyrics**
+	else if(message.body.toLowerCase().startsWith('/lyrics ') || message.body.toLowerCase().startsWith('/ly ')){
+        let list = message.body.split(" ")
+        let list2 = list.slice(1)
+        let question = list2.join(" ")
+        let lyricsList = '';
+        async function lyrics() {
+            const  engine_id = "KEY";
+            const api_key = "KEY";
+            const f_page = 1;
+            const start = (f_page - 1) * 10 + 1;
+            
+            request('https://www.googleapis.com/customsearch/v1?key=' + api_key + '&cx=' + engine_id + '&q=' + question + '&start=' + start, async function(error, response, body){
+                let f_links_json = JSON.parse(body);
+                let f_items = f_links_json['items'];
+                let f_firstSearch = f_items[0];
+                let url = f_firstSearch['link'];
+
+				const browser = await puppeteer.launch({headless: true});
+                const page = await browser.newPage();
+                await page.goto(url, {waitUntil:'domcontentloaded'});
+				
+                let checks = await page.$$('div[class*="Lyrics__Container-sc-"]')
+                for(check of checks){
+                    let text = await (await check.getProperty('innerText')).jsonValue();
+                    console.log(text)
+                    lyricsList += text
+                }
+                message.reply(lyricsList)
+                await browser.close();
+            })
+            
+        }
+        lyrics();
+
+    }
+		// doubtnut
+		else if (message.body.toLowerCase().startsWith('/doubtnut ')){
+	        const question = message.body.slice(10);
+	        const  engine_id = "KEY";
+	        const api_key = "KEY";
+	        const page = 1;
+	        const start = (page - 1) * 10 + 1;
+	
+	        request('https://www.googleapis.com/customsearch/v1?key=' + api_key + '&cx=' + engine_id + '&q=' + question + '&start=' + start, function(error, response, body){
+	            let f_links_json = JSON.parse(body);
+	            let f_items = f_links_json['items'];
+	            let f_firstSearch = f_items[0];
+	            url = f_firstSearch['link'];
+	
+	        const fetchData = async () => {
+	        let res = await axios.get(url);
+	        let $ = await cheerio.load(res.data);
+	        let txt = $("#__NEXT_DATA__").text();
+	        let json = JSON.parse(txt);
+	        let props = json['props'];
+	        let pageProps = props['pageProps'];
+	        let videoData = pageProps['videoData'];
+	        let title = videoData['title'];
+	        let rawVideoLink = videoData['video_name'];
+	        let videoLink = "https://videos.doubtnut.com/" + rawVideoLink;
+	        let rawDuration = videoData['duration'];
+	        let duration = rawDuration / 60;
+	        message.reply(`Title:  ${title}\n${videoLink}\nDuration: ${Math.round(duration)}mins`);
+	        }
+	        fetchData();
+	
+	    })
+	    }
     // wolfram***
     else if (message.body.toLowerCase().startsWith("/wf ")) {
         const query = message.body.slice(3).replaceAll(" ", "+")
