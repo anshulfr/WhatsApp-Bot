@@ -336,37 +336,37 @@ client.on('message', async message => {
         lyrics();
 
     }
-		// doubtnut
-		else if (message.body.toLowerCase().startsWith('/doubtnut ')){
-	        const question = message.body.slice(10);
-	        const  engine_id = "KEY";
-	        const api_key = "KEY";
-	        const page = 1;
-	        const start = (page - 1) * 10 + 1;
-	
-	        request('https://www.googleapis.com/customsearch/v1?key=' + api_key + '&cx=' + engine_id + '&q=' + question + '&start=' + start, function(error, response, body){
-	            let f_links_json = JSON.parse(body);
-	            let f_items = f_links_json['items'];
-	            let f_firstSearch = f_items[0];
-	            url = f_firstSearch['link'];
-	
-	        const fetchData = async () => {
-	        let res = await axios.get(url);
-	        let $ = await cheerio.load(res.data);
-	        let txt = $("#__NEXT_DATA__").text();
-	        let json = JSON.parse(txt);
-	        let props = json['props'];
-	        let pageProps = props['pageProps'];
-	        let videoData = pageProps['videoData'];
-	        let title = videoData['title'];
-	        let rawVideoLink = videoData['video_name'];
-	        let videoLink = "https://videos.doubtnut.com/" + rawVideoLink;
-	        let rawDuration = videoData['duration'];
-	        let duration = rawDuration / 60;
-	        message.reply(`Title:  ${title}\n${videoLink}\nDuration: ${Math.round(duration)}mins`);
-	        }
-	        fetchData();
-	
+	// doubtnut**
+	else if (message.body.toLowerCase().startsWith('/doubtnut ')){
+		const question = message.body.slice(10);
+		const  engine_id = "KEY";
+		const api_key = "KEY";
+		const page = 1;
+		const start = (page - 1) * 10 + 1;
+		
+		request('https://www.googleapis.com/customsearch/v1?key=' + api_key + '&cx=' + engine_id + '&q=' + question + '&start=' + start, function(error, response, body){
+		    let f_links_json = JSON.parse(body);
+		    let f_items = f_links_json['items'];
+		    let f_firstSearch = f_items[0];
+		    url = f_firstSearch['link'];
+		
+		const fetchData = async () => {
+			let res = await axios.get(url);
+			let $ = await cheerio.load(res.data);
+			let txt = $("#__NEXT_DATA__").text();
+			let json = JSON.parse(txt);
+			let props = json['props'];
+			let pageProps = props['pageProps'];
+			let videoData = pageProps['videoData'];
+			let title = videoData['title'];
+			let rawVideoLink = videoData['video_name'];
+			let videoLink = "https://videos.doubtnut.com/" + rawVideoLink;
+			let rawDuration = videoData['duration'];
+			let duration = rawDuration / 60;
+			message.reply(`Title:  ${title}\n${videoLink}\nDuration: ${Math.round(duration)}mins`);
+		}
+		fetchData();
+
 	    })
 	    }
     // wolfram***
