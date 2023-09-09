@@ -369,6 +369,37 @@ client.on('message', async message => {
 
 	    })
 	    }
+
+		// reddit**
+	    else if(message.body.toLowerCase().startsWith('/reddit ') || message.body.toLowerCase().startsWith('/rd')){
+	        let messageToSend = ""
+	        let list = message.body.split(" ")
+	        let list2 = list.slice(1)
+	        let subr = list2.join(" ")
+	        request("https://redditapi.s9001.repl.co/reddit/" + subr, async function (error, response, body) {
+	            try{
+	                let data = body.split(" ");
+	                if(data[0] == 'meta'){
+	                    messageToSend = `URL: ${data[1]}\nTitle: ${data[2].replaceAll('_', ' ')}\nScore: ${data[3]}`;
+	                    try{
+	                        let chat = await message.getChat();
+	                        var media = await MessageMedia.fromUrl(data[4]);
+	                        await chat.sendMessage(media, {caption: `URL: ${data[1]}\nTitle: ${data[2].replaceAll('_', ' ')}\nScore: ${data[3]}`});   
+	                    }
+	                    catch(e){
+	                        message.reply(messageToSend);   
+	                    }
+	                }
+	                else{
+	                    message.reply(body);
+	                }
+	            }  
+	            catch(err){
+	                message.reply("Reddit go brrrr...")
+	            }
+	        });
+    	}
+			
     // wolfram***
     else if (message.body.toLowerCase().startsWith("/wf ")) {
         const query = message.body.slice(3).replaceAll(" ", "+")
